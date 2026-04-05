@@ -10,6 +10,13 @@ hands = mp_hands.Hands(
     min_tracking_confidence=0.7
 )
 
+def is_pinching(hand_landmarks):
+    thumb_tip = hand_landmarks.landmark[4]
+    index_tip = hand_landmarks.landmark[8]
+    distance = ((thumb_tip.x - index_tip.x)**2 + 
+                (thumb_tip.y - index_tip.y)**2)**0.5
+    return distance < 0.05
+
 cap = cv2.VideoCapture(0)
 
 while True:
@@ -28,6 +35,9 @@ while True:
                 hand_landmarks,
                 mp_hands.HAND_CONNECTIONS
             )
+            if is_pinching(hand_landmarks):
+                cv2.putText(frame, "PINCHING!", (50, 50),
+                           cv2.FONT_HERSHEY_SIMPLEX, 1, (0, 255, 0), 2)
 
     cv2.imshow("Hand Tracking", frame)
 
